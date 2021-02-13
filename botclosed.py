@@ -91,7 +91,7 @@ async def on_message(message):
         embed.add_field(name="$stonk account", value="I'll show you your account info or make an account if you don't have one")
         embed.add_field(name="$stonk market", value="I'll show you the current prices of all shares available while the market is open")
         embed.add_field(name="$stonk price $TIC", value="Where $TIC is your ticker, I'll tell you how much it costs")
-        embed.add_field(name="$stonk price person or @person", value="I can spy on someone else's account if you like! Make sure to use their discord name (not server nick), and be specific! @them if you want them to know!")
+        embed.add_field(name="$stonk spy person or @person", value="I can spy on someone else's account if you like! Make sure to use their discord name (not server nick), and be specific! @them if you want them to know!")
         await message.channel.send(embed=embed)
     elif message.content.startswith('$stonk market'):
         username = str(message.author)
