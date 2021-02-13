@@ -134,8 +134,8 @@ async def on_message(message):
                     holdqty = str(holdqty) + str(values) + "\n"
                     holdticker = str(holdticker) + "$" + str(col_names[idx]) + "\n"
                     c.execute("SELECT Price FROM Stonks WHERE ticker = '$" + col_names[idx] + "'")
-                    iterstonkvalue = c.fetchone()
-                    iterstonkvalue = iterstonkvalue[0] * values
+                    stonkvalue = c.fetchone()
+                    iterstonkvalue = stonkvalue[0] * values
                     networth = networth + iterstonkvalue
             if holdqty == "":
                 embed = discord.Embed()
