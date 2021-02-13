@@ -1,7 +1,7 @@
 import discord
 import os
 import sqlite3
-from disputils import BotEmbedPaginator
+import re
 
 client = discord.Client()
 db = "./stonkdb.db"
