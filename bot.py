@@ -29,12 +29,17 @@ async def on_message(message):
             else:
                 holdqty = ""
                 holdticker = ""
+                networth = int(info[0][2])
                 cash = str(info[0][2])
                 stonks = info[0][3:]
                 for idx,values in enumerate(stonks):
                     if values > 0:
                         holdqty = str(holdqty) + str(values) + "\n"
-                        holdticker = str(holdticker) + "$" + str(col_names[idx]) + "\n" 
+                        holdticker = str(holdticker) + "$" + str(col_names[idx]) + "\n"
+                        c.execute("SELECT Price FROM Stonks WHERE ticker = '$" + col_names[idx] + "'")
+                        iterstonkvalue = c.fetchall()
+                        iterstonkvalue = iterstonkvalue[0][0] * values
+                        networth = networth + iterstonkvalue 
                 if holdqty == "":
                     embed = discord.Embed()
                     embed.set_author(name="Stonks Bot")
@@ -47,9 +52,10 @@ async def on_message(message):
                     embed.set_author(name="Stonks Bot")
                     embed.color = 0xf1c40f
                     embed.title = "Current info for " + str(username)
-                    embed.add_field(name="Cash on hand", value="$" + cash)
-                    embed.add_field(name="Ticker", value=holdticker)
-                    embed.add_field(name="Held QTY", value=holdqty)
+                    embed.add_field(name="Ticker", value=holdticker, inline=True)
+                    embed.add_field(name="Held QTY", value=holdqty, inline=True)
+                    embed.add_field(name="Cash on hand", value="$" + cash, inline=False)
+                    embed.add_field(name="Current Net Worth", value= "$" + str(networth), inline = False)
                     await message.channel.send(embed=embed)
         except:
             embed = discord.Embed()
@@ -145,6 +151,7 @@ async def on_message(message):
             embed.add_field(name="$stonk sell $TIC X", value="Where $TIC is your ticker and X is how many shares you want to sell, I'll make an order to sell that many shares")
             embed.add_field(name="$stonk market", value="I'll show you the current prices of all shares available")
             embed.add_field(name="$stonk price $TIC", value="Where $TIC is your ticker, I'll tell you how much it costs")
+            embed.add_field(name="$stonk spy person or @person", value="I can spy on someone else's account if you like! Make sure to use their discord name (not server nick), and be specific! @them if you want them to know!")
             await message.channel.send(embed=embed)
         except:
             embed = discord.Embed()
@@ -222,6 +229,66 @@ async def on_message(message):
             embed.add_field(name="Ticker", value=tickerlist)
             embed.add_field(name="Prices", value=pricelist)
             await message.channel.send(embed=embed)
+        except:
+            embed = discord.Embed()
+            embed.set_author(name="Stonks Bot")
+            embed.color = 0xf1c40f
+            embed.add_field(name="Congrats!", value="You input something that caused an unexpected error, if you think the thing you did should work, let someone from BC know.")
+            await message.channel.send(embed=embed)
+    elif message.content.startswith("$stonk spy"):
+        try:
+            cmd1,cmd2,spyuser = message.content.split(" ")
+            try:
+                cfn = re.findall("\d+", spyuser)[0].isnumeric()
+            except:
+                cfn = False
+            if cfn:
+                userid = re.findall("\d+", spyuser)[0]
+                c.execute("SELECT * from 'Users' WHERE UserID = '" + str(userid) + "'")
+            else:
+                c.execute("SELECT * from 'Users' WHERE Username like '" + str(spyuser) + "%'")
+            username = str(message.author)
+            col_names = [cn[0] for cn in c.description]
+            col_names = col_names[3:]
+            info = c.fetchone()
+            holdqty = ""
+            holdticker = ""
+            if info == None:
+                embed = discord.Embed()
+                embed.set_author(name="Stonks Bot")
+                embed.color = 0xf1c40f
+                embed.add_field(name="Sorry!", value="I couldn't find anyone to spy on with the name you gave me, try being more specific!")
+                await message.channel.send(embed=embed)
+            else:
+                username = str(info[1])
+                networth = int(info[2])
+                cash = str(info[2])
+                stonks = info[3:]
+                for idx,values in enumerate(stonks):
+                    if values > 0:
+                        holdqty = str(holdqty) + str(values) + "\n"
+                        holdticker = str(holdticker) + "$" + str(col_names[idx]) + "\n"
+                        c.execute("SELECT Price FROM Stonks WHERE ticker = '$" + col_names[idx] + "'")
+                        stonkvalue = c.fetchone()
+                        iterstonkvalue = stonkvalue[0] * values
+                        networth = networth + iterstonkvalue
+                if holdqty == "":
+                    embed = discord.Embed()
+                    embed.set_author(name="Stonks Bot")
+                    embed.color = 0xf1c40f
+                    embed.title = "Current info for " + str(username)
+                    embed.add_field(name="Cash on hand", value="$" + cash)
+                    await message.channel.send(embed=embed)
+                else:
+                    embed = discord.Embed()
+                    embed.set_author(name="Stonks Bot")
+                    embed.color = 0xf1c40f
+                    embed.title = "Current info for " + str(username)
+                    embed.add_field(name="Ticker", value=holdticker, inline=True)
+                    embed.add_field(name="Held QTY", value=holdqty, inline=True)
+                    embed.add_field(name="Cash on hand", value="$" + cash, inline=False)
+                    embed.add_field(name="Current Net Worth", value= "$" + str(networth), inline = False)
+                    await message.channel.send(embed=embed)
         except:
             embed = discord.Embed()
             embed.set_author(name="Stonks Bot")
