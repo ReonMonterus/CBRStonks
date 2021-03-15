@@ -126,5 +126,4 @@ dmypy.json
 .pyre/
 
 #other
-*.db
 *.cfg
